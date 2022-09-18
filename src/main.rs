@@ -23,10 +23,12 @@ fn main() {
         }
     };
 
-    File::create("output.txt")
-        .unwrap()
-        .write_all(output.as_bytes())
-        .unwrap();
+    let mut output_file = match &cli.output {
+        Some(filename) => File::create(filename).unwrap(),
+        None => File::create("output.txt").unwrap()
+    };
+
+    output_file.write_all(output.as_bytes()).unwrap();
 }
 
 fn read_file(pb: &PathBuf) -> String {
@@ -46,8 +48,11 @@ pub struct Cli {
     #[clap(subcommand)]
     command: Commands,
     /// Cipher used for ciphering
-    #[clap(short, value_parser)]
-    cipher: String
+    #[clap(short, long, value_parser)]
+    cipher: String,
+    /// Name for the output file
+    #[clap(short, long, value_parser)]
+    output: Option<PathBuf>
 }
 
 #[derive(Debug, Subcommand)]
